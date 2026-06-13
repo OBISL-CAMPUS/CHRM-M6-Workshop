@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBISL Campus | Training & Development Bilingual Practicum</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React and Babel CDNs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.3/babel.min.js"></script>
+    <!-- Google Fonts with Sinhala Support -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+Sinhala:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- MathJax for rendering dynamic LaTeX formulas beautifully -->
+    <script type="text/javascript" async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [['$','$'], ['\\(','\\)']],
+          displayMath: [['$$','$$'], ['\\[','\\]']],
+          processClass: "mathjax-render",
+          ignoreClass: "no-mathjax-render"
+        },
+        "HTML-CSS": { linebreaks: { automatic: true } },
+        SVG: { linebreaks: { automatic: true } }
+      });
+    </script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        sinhala: ['Noto Sans Sinhala', 'Iskoola Pota', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            900: '#064e3b',
+                        },
+                        tech: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            950: '#030712',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style type="text/css">
+        /* Glassmorphism Background Orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(140px);
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        /* Hidden Scrollbar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Fade-in animations for tab changes */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        /* MathJax visual adjustments */
+        .MathJax_Display, .MathJax {
+            color: #e2e8f0 !important;
+            outline: none;
+        }
+
+        /* Printing optimizations */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+                font-size: 12pt;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-card {
+                background: white !important;
+                border: 1px solid #ccc !important;
+                color: black !important;
+                box-shadow: none !important;
+                backdrop-filter: none !important;
+            }
+            .print-active-tab {
+                display: block !important;
+                width: 100% !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+            }
+        }
+
+        /* Pulse indicators */
+        .pulse-emerald {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse-em 2s infinite;
+        }
+        @keyframes pulse-em {
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-brand-500 selection:text-white font-sans antialiased relative overflow-x-hidden">
+
+    <!-- Glowing Decorative Background Elements -->
+    <div class="orb w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] bg-brand-900/20 top-[-100px] left-[-100px]"></div>
+    <div class="orb w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] bg-tech-700/10 bottom-[10%] right-[-100px]"></div>
+
+    <!-- React Root Entry -->
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, createContext, useContext } = React;
+
+        // Custom React Language Context to pass state deeply
+        const LangContext = createContext('en');
+
+        // Custom Raw SVG React Icons (Guarantees standalone offline stability)
+        const IconGlobe = () => (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+            </svg>
+        );
+
+        const IconDeepDive = () => (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+        );
+
+        const IconScenario = () => (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+            </svg>
+        );
+
+        const IconDiagnostic = () => (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+        );
+
+        const IconSim1 = () => (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
+            </svg>
+        );
+
+        const IconSim2 = () => (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 12l3-3 3 3 4-4M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+        );
+
+        const IconSim3 = () => (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17"></path>
+            </svg>
+        );
+
+        const IconBreakout = () => (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path>
+            </svg>
+        );
+
+        const IconPrint = () => (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+            </svg>
+        );
+
+        // Translational Component with no double-stack fallback
+        const Trans = ({ en, si, overrideClass = "" }) => {
+            const langMode = useContext(LangContext);
+            if (langMode === 'si') {
+                return <span className={`font-sinhala ${overrideClass}`}>{si}</span>;
+            }
+            return <span className={overrideClass}>{en}</span>;
+        };
+
+        // Core App Component
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('case');
+            const [langMode, setLangMode] = useState('en'); // 'en', 'si'
+
+            // Shared / Interactive Simulator States
+            // Sim 1: L&D Architecture
+            const [archMode, setArchMode] = useState('federated'); // centralized, decentralized, federated
+            const [isSim1Processing, setIsSim1Processing] = useState(false);
+
+            // Sim 2: Dynamic Decision Cascade
+            const [selectedGoal, setSelectedGoal] = useState('cloud'); // 'cloud', 'retention', 'factory'
+            const [readinessSlider, setReadinessSlider] = useState(65);
+            const [incentiveSlider, setIncentiveSlider] = useState(40);
+
+            // Sim 3: ADDIE vs SAM Workflow Toggle
+            const [workflowType, setWorkflowType] = useState('sam'); // addie, sam
+            const [activeWorkflowStep, setActiveWorkflowStep] = useState(0);
+
+            // Calculator 1: ROI
+            const [roiCost, setRoiCost] = useState(1500000); // LKR
+            const [roiGain, setRoiGain] = useState(4500000); // LKR (Gross)
+
+            // Calculator 2: Succession & BSR
+            const [criticalRoles, setCriticalRoles] = useState(6);
+            const [readyCandidates, setReadyCandidates] = useState(15);
+
+            // Dialogue Prompts Expanded Index
+            const [expandedPrompt, setExpandedPrompt] = useState(null);
+
+            // Custom Notification Toast State
+            const [toastMessage, setToastMessage] = useState(null);
+
+            const showToast = (enMsg, siMsg) => {
+                setToastMessage({ en: enMsg, si: siMsg });
+                setTimeout(() => {
+                    setToastMessage(null);
+                }, 4000);
+            };
+
+            // Handlers
+            const handleArchChange = (mode) => {
+                setIsSim1Processing(true);
+                setTimeout(() => {
+                    setArchMode(mode);
+                    setIsSim1Processing(false);
+                    showToast(
+                        "Talent Architecture reassigned successfully!",
+                        "පුහුණු ආයතනික ව්‍යුහය සාර්ථකව යාවත්කාලීන කරන ලදී!"
+                    );
+                }, 500);
+            };
+
+            const triggerPrint = () => {
+                window.print();
+            };
+
+            // Dynamic Calculations for Cascade Simulator (Sim 2)
+            const cascadeResults = useMemo(() => {
+                let successRate = Math.round((readinessSlider * 0.6) + (incentiveSlider * 0.4));
+                let timeToValue = Math.max(14, Math.round(90 - (readinessSlider * 0.5) - (incentiveSlider * 0.3)));
+                let alignmentMetric = Math.round((incentiveSlider * 0.8) + (readinessSlider * 0.2));
+                
+                let classificationEn = "High Risk";
+                let classificationSi = "ඉහළ අවදානමක්";
+                let colorClass = "text-rose-400";
+                if (successRate >= 75) {
+                    classificationEn = "Optimally Aligned";
+                    classificationSi = "උපරිම ගැලපීමක්";
+                    colorClass = "text-emerald-400";
+                } else if (successRate >= 50) {
+                    classificationEn = "Moderate Performance";
+                    classificationSi = "මධ්‍යස්ථ මට්ටමක්";
+                    colorClass = "text-amber-400";
+                }
+
+                return { successRate, timeToValue, alignmentMetric, classificationEn, classificationSi, colorClass };
+            }, [readinessSlider, incentiveSlider, selectedGoal]);
+
+            // React Effect to dynamically re-compile and display MathJax formulas
+            useEffect(() => {
+                if (window.MathJax && window.MathJax.Hub) {
+                    window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub]);
+                }
+            }, [activeTab, langMode, selectedGoal, readinessSlider, incentiveSlider, workflowType, roiCost, roiGain, criticalRoles, readyCandidates, expandedPrompt]);
+
+            return (
+                <LangContext.Provider value={langMode}>
+                    <div className="flex flex-col md:flex-row min-h-screen">
+                        
+                        {/* Toast System Notification with Strict Language Clutter Reduction */}
+                        {toastMessage && (
+                            <div className="fixed bottom-5 right-5 z-50 max-w-sm bg-slate-900 border border-emerald-500/30 p-4 rounded-xl shadow-2xl flex items-start gap-3 animate-bounce no-mathjax-render">
+                                <span className="text-emerald-400 text-lg">💡</span>
+                                <div>
+                                    {langMode === 'en' ? (
+                                        <p className="text-xs font-bold text-slate-100">{toastMessage.en}</p>
+                                    ) : (
+                                        <p className="text-xs font-bold font-sinhala text-slate-100 leading-relaxed">{toastMessage.si}</p>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Top Navigation Panel for Mobile Devices ONLY */}
+                        <div className="md:hidden w-full bg-slate-900/95 sticky top-0 z-30 border-b border-slate-800/80 no-print">
+                            <div className="p-3 flex items-center justify-between border-b border-slate-800">
+                                <div className="flex items-center gap-2">
+                                    <div className="h-7 w-7 rounded bg-emerald-500 flex items-center justify-center font-bold text-slate-950 text-sm shadow">
+                                        Ω
+                                    </div>
+                                    <span className="text-xs font-bold tracking-wider">OBISL CHRM</span>
+                                </div>
+                                <div className="flex bg-slate-950 border border-slate-800 p-0.5 rounded-lg text-[10px]">
+                                    <button 
+                                        onClick={() => {
+                                            setLangMode('en');
+                                            showToast("Language set to English", "භාෂාව ඉංග්‍රීසි ලෙස වෙනස් කරන ලදී.");
+                                        }} 
+                                        className={`px-3 py-1 rounded transition-all ${langMode === 'en' ? 'bg-emerald-500 text-slate-950 font-bold' : 'text-slate-400'}`}
+                                    >
+                                        English
+                                    </button>
+                                    <button 
+                                        onClick={() => {
+                                            setLangMode('si');
+                                            showToast("Language set to Sinhala", "භාෂාව සිංහල ලෙස වෙනස් කරන ලදී.");
+                                        }} 
+                                        className={`px-3 py-1 rounded transition-all ${langMode === 'si' ? 'bg-emerald-500 text-slate-950 font-bold font-sinhala' : 'text-slate-400'}`}
+                                    >
+                                        සිංහල
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2 overflow-x-auto px-3 py-2.5 no-scrollbar scroll-smooth">
+                                {[
+                                    { id: 'case', icon: <IconGlobe />, label: 'Case Insight', si: 'සිද්ධිය' },
+                                    { id: 'deep', icon: <IconDeepDive />, label: 'Deep Dive', si: 'න්‍යාය' },
+                                    { id: 'scenarios', icon: <IconScenario />, label: 'Scenarios', si: 'ප්‍රායෝගික' },
+                                    { id: 'diag', icon: <IconDiagnostic />, label: 'Diagnostics', si: 'මිණුම්' },
+                                    { id: 'sim1', icon: <IconSim1 />, label: 'Arch Sim', si: 'ව්‍යුහය' },
+                                    { id: 'sim2', icon: <IconSim2 />, label: 'Cascade Sim', si: 'තීරණ' },
+                                    { id: 'sim3', icon: <IconSim3 />, label: 'Workflow Sim', si: 'ක්‍රියාවලි' },
+                                    { id: 'breakout', icon: <IconBreakout />, label: 'Breakout', si: 'සාකච්ඡා' }
+                                ].map((tab) => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => {
+                                            setActiveTab(tab.id);
+                                            showToast(`Mapped to ${tab.label}`, `${tab.label} වෙත මාරු විය.`);
+                                        }}
+                                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all border ${
+                                            activeTab === tab.id 
+                                            ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400 shadow-sm' 
+                                            : 'border-transparent text-slate-400 hover:bg-slate-800/40'
+                                        }`}
+                                        style={{ minHeight: '38px' }}
+                                    >
+                                        {tab.icon}
+                                        <span>{langMode === 'si' ? tab.si : tab.label}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Left Sidebar - Command Navigation for Desktop Devices Only */}
+                        <aside className="hidden md:flex w-64 bg-slate-900/80 backdrop-blur-md border-r border-slate-800/80 flex-col justify-between sticky top-0 h-screen z-20 no-print">
+                            <div>
+                                {/* Brand & Logo */}
+                                <div className="p-5 border-b border-slate-800/80 flex items-center gap-3">
+                                    <div className="h-9 w-9 rounded-lg bg-emerald-500 flex items-center justify-center font-bold text-slate-950 text-lg shadow-lg shadow-emerald-500/30 pulse-emerald">
+                                        Ω
+                                    </div>
+                                    <div>
+                                        <h1 className="text-sm font-bold tracking-wider text-white">OBISL CAMPUS</h1>
+                                        <p className="text-[10px] text-emerald-400 uppercase tracking-widest font-semibold">T&D Practicum</p>
+                                    </div>
+                                </div>
+
+                                {/* Tabs List */}
+                                <nav className="p-4 space-y-1 overflow-y-auto no-scrollbar max-h-[calc(100vh-180px)]">
+                                    {[
+                                        { id: 'case', icon: <IconGlobe />, label: 'Case Insight', si: 'සිද්ධි අධ්‍යයනය' },
+                                        { id: 'deep', icon: <IconDeepDive />, label: 'Deep Dive Analysis', si: 'විශ්ලේෂණය' },
+                                        { id: 'scenarios', icon: <IconScenario />, label: 'Scenario Suite', si: 'ප්‍රායෝගික අවස්ථා' },
+                                        { id: 'diag', icon: <IconDiagnostic />, label: 'Diagnostic Lab', si: 'මිණුම් විද්‍යාගාරය' },
+                                        { id: 'sim1', icon: <IconSim1 />, label: 'Architecture Sim', si: 'ව්‍යුහ අනුකරණය' },
+                                        { id: 'sim2', icon: <IconSim2 />, label: 'Decision Cascade', si: 'තීරණ ප්‍රවාහය' },
+                                        { id: 'sim3', icon: <IconSim3 />, label: 'Workflow Sim', si: 'ක්‍රියාවලි අනුකරණය' },
+                                        { id: 'breakout', icon: <IconBreakout />, label: 'Breakout Rooms', si: 'සාකච්ඡා කුටි' }
+                                    ].map((tab) => (
+                                        <button
+                                            key={tab.id}
+                                            onClick={() => {
+                                                setActiveTab(tab.id);
+                                                showToast(
+                                                    `Mapped to ${tab.label}`,
+                                                    `${tab.si} වෙත මාරු විය.`
+                                                );
+                                            }}
+                                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-left ${
+                                                activeTab === tab.id 
+                                                ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 shadow-md' 
+                                                : 'hover:bg-slate-800/40 text-slate-400 hover:text-slate-200 border border-transparent'
+                                            }`}
+                                        >
+                                            <div className={`transition-transform duration-200 ${activeTab === tab.id ? 'scale-110 text-emerald-400' : 'text-slate-400 group-hover:text-slate-200'}`}>
+                                                {tab.icon}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                {langMode === 'en' ? (
+                                                    <div className="text-xs font-semibold truncate">{tab.label}</div>
+                                                ) : (
+                                                    <div className="text-xs font-semibold font-sinhala truncate">{tab.si}</div>
+                                                )}
+                                            </div>
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            {/* Print Trigger & Support */}
+                            <div className="p-4 border-t border-slate-800/80 space-y-3 bg-slate-950/20 font-sans">
+                                <button 
+                                    onClick={triggerPrint}
+                                    className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold text-slate-200 transition-all shadow-md"
+                                >
+                                    <IconPrint />
+                                    <Trans en="Export / Print" si="පිටපත් කරන්න" />
+                                </button>
+                                <div className="text-[10px] text-slate-500 text-center font-semibold">
+                                    HOTLINE: 0788 03 03 03
+                                </div>
+                            </div>
+                        </aside>
+
+                        {/* Main Dynamic Area */}
+                        <main className="flex-1 flex flex-col min-w-0">
+                            
+                            {/* Sticky Top Header for Desktop */}
+                            <header className="hidden md:flex sticky top-0 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 p-4 items-center justify-between gap-4 z-10 no-print font-sans">
+                                <div className="flex items-center gap-2">
+                                    <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                                    <div>
+                                        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-300">OBISL CAMPUS | PRACTICUM WORKSPACE</h2>
+                                        <p className="text-[11px] text-slate-500 font-semibold">
+                                            MODULE 6: TRAINING & DEVELOPMENT (STRATEGIC FRAMEWORKS)
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Language Command Center - Pure single mode transitions */}
+                                <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-xl shadow-lg">
+                                    {[
+                                        { id: 'en', label: 'English' },
+                                        { id: 'si', label: 'සිංහල' }
+                                    ].map((lang) => (
+                                        <button
+                                            key={lang.id}
+                                            onClick={() => {
+                                                setLangMode(lang.id);
+                                                showToast(
+                                                    'Language set to English',
+                                                    'භාෂාව සිංහල ලෙස වෙනස් කරන ලදී.'
+                                                );
+                                            }}
+                                            className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                                                langMode === lang.id
+                                                ? 'bg-emerald-500 text-slate-950 font-bold shadow-md'
+                                                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                                            }`}
+                                        >
+                                            {lang.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </header>
+
+                            {/* Central Active Workspace */}
+                            <div className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl w-full mx-auto space-y-6 mathjax-render">
+
+                                {/* TAB 1: CASE INSIGHT (Nexus Financial Case Study) */}
+                                {activeTab === 'case' && (
+                                    <section className="space-y-6 print-active-tab animate-fadeIn">
+                                        <div className="border-b border-slate-800 pb-3">
+                                            <h3 className="text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2">
+                                                <span className="text-emerald-500">🌐</span>
+                                                <Trans en="Nexus Financial Case Study Insight" si="Nexus Financial සිද්ධි අධ්‍යයන විශ්ලේෂණය" />
+                                            </h3>
+                                            <p className="text-xs text-slate-400 mt-1">
+                                                <Trans en="Strategic diagnosis and results of a market disruption recovery" si="වෙළඳපොළ බාධාකාරී තත්ත්වයන් මඟහරවා ගැනීමේ උපායමාර්ගික ප්‍රවේශය" />
+                                            </p>
+                                        </div>
+
+                                        {/* Critical Background Stats */}
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                            <div className="bg-rose-950/20 border border-rose-500/20 p-4 rounded-2xl flex flex-col justify-between">
+                                                <span className="text-rose-400 text-xs font-bold tracking-wider uppercase"><Trans en="Primary Threat" si="ප්‍රධාන තර්ජනය" /></span>
+                                                <span className="text-2xl sm:text-3xl font-extrabold text-rose-500 my-1 sm:my-2">{"$-14\\%"}</span>
+                                                <span className="text-xs text-slate-400 font-semibold"><Trans en="Customer Retention Drop" si="පාරිභෝගික රඳවා ගැනීම පහත වැටීම" /></span>
+                                            </div>
+                                            <div className="bg-tech-950/20 border border-tech-500/20 p-4 rounded-2xl flex flex-col justify-between">
+                                                <span className="text-tech-400 text-xs font-bold tracking-wider uppercase"><Trans en="Diagnostic Move" si="හඳුනාගත් පියවර" /></span>
+                                                <span className="text-xl sm:text-2xl font-extrabold text-tech-400 my-1 sm:my-2">TNA</span>
+                                                <span className="text-xs text-slate-400 font-semibold"><Trans en="Data-Driven Needs Analysis" si="දත්ත පදනම් කරගත් පුහුණු අවශ්‍යතා විශ්ලේෂණය" /></span>
+                                            </div>
+                                            <div className="bg-emerald-950/20 border border-emerald-500/20 p-4 rounded-2xl flex flex-col justify-between">
+                                                <span className="text-emerald-400 text-xs font-bold tracking-wider uppercase"><Trans en="Recovery Impact" si="ප්‍රතිසාධන බලපෑම" /></span>
+                                                <span className="text-2xl sm:text-3xl font-extrabold text-emerald-400 my-1 sm:my-2">{'$+45\\%'}</span>
+                                                <span className="text-xs text-slate-400 font-semibold"><Trans en="Engineering Deployment Acceleration" si="ඉංජිනේරුමය නිෂ්පාදන දියත් කිරීම් වේගවත් වීම" /></span>
+                                            </div>
+                                        </div>
+
+                                        {/* Problem, Approach, Results Timeline */}
+                                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                            {/* Problem */}
+                                            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 relative overflow-hidden">
+                                                <div className="absolute top-0 right-0 bg-rose-500/10 text-rose-400 text-[10px] px-3 py-1 font-bold rounded-bl-xl uppercase"><Trans en="The Rift" si="ගැටලුව" /></div>
+                                                <h4 className="text-rose-400 font-bold mb-3 flex items-center gap-1.5 text-sm uppercase">
+                                                    <span>🚨</span> <Trans en="1. Identifying The Gap" si="1. පරතරය හඳුනා ගැනීම" />
+                                                </h4>
+                                                <div className="space-y-4 text-xs text-slate-300">
+                                                    <p>
+                                                        <Trans 
+                                                            en="The organizational crisis stemmed from a bifurcated failure. Engineering output slowed due to zero legacy cloud competence, while Sales dropped retention rates because their commission structures rewards legacy deals over client-relationship quality." 
+                                                            si="සංවිධානාත්මක අර්බුදයට හේතු වූයේ ද්විත්ව අසාර්ථකත්වයකි. වලාකුළු (Cloud) තාක්ෂණය පිළිබඳ දැනුම නොමැතිකම නිසා ඉංජිනේරු අංශයේ ප්‍රගතිය අඩාල වූ අතර, පැරණි විකුණුම් කොමිස් ක්‍රමය නිසා පාරිභෝගික සබඳතාවලට වඩා ගනුදෙනු අවසන් කිරීමට යොමු වීමෙන් පාරිභෝගික රඳවා ගැනීම පහත වැටුණි." 
+                                                        />
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* Approach */}
+                                            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 relative overflow-hidden">
+                                                <div className="absolute top-0 right-0 bg-amber-500/10 text-amber-400 text-[10px] px-3 py-1 font-bold rounded-bl-xl uppercase"><Trans en="TNA Execution" si="උපායමාර්ගය" /></div>
+                                                <h4 className="text-amber-400 font-bold mb-3 flex items-center gap-1.5 text-sm uppercase">
+                                                    <span>⚡</span> <Trans en="2. Splitting Capability" si="2. හැකියාවන් වෙන්කර හඳුනා ගැනීම" />
+                                                </h4>
+                                                <div className="space-y-4 text-xs text-slate-300">
+                                                    <p>
+                                                        <Trans 
+                                                            en="Engineering suffered from a Capability Gap ('Can't Do'). CHRO responded with cloud bootcamps and sandboxed OJT learning cohorts. Sales, however, had a Motivation Barrier ('Won't Do'). Traditional training would fail here; hence, CHRO restructured commission structures." 
+                                                            si="ඉංජිනේරු අංශයට අවශ්‍ය වූයේ දැනුමයි ('Can't Do' - හැකියාවන් නොමැතිකම). ඒ සඳහා විශේෂිත ප්‍රායෝගික OJT පුහුණු කණ්ඩායම් හඳුන්වා දෙන ලදී. විකුණුම් අංශයට තිබුණේ අභිප්‍රේරණ ගැටලුවකි ('Won't Do' - අකමැත්ත). ඒ සඳහා කොමිස් දිරිගැන්වීමේ ක්‍රමය ප්‍රතිසංස්කරණය කරන ලදී." 
+                                                        />
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* Results */}
+                                            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 relative overflow-hidden">
+                                                <div className="absolute top-0 right-0 bg-emerald-500/10 text-emerald-400 text-[10px] px-3 py-1 font-bold rounded-bl-xl uppercase"><Trans en="Empirical ROI" si="ප්‍රතිඵලය" /></div>
+                                                <h4 className="text-emerald-400 font-bold mb-3 flex items-center gap-1.5 text-sm uppercase">
+                                                    <span>🎯</span> <Trans en="3. Quantifiable Impacts" si="3. සංඛ්‍යාත්මක ජයග්‍රහණ" />
+                                                </h4>
+                                                <div className="space-y-4 text-xs text-slate-300">
+                                                    <p>
+                                                        <Trans 
+                                                            en="Engineering deployment cycle sped up by 45%. System deployment became agile, cloud-native ready. Simultaneously, customer retention stabilized with customer churn dropping by 11% overall in critical sectors." 
+                                                            si="ඉංජිනේරුමය නිෂ්පාදන චක්‍රය 45% කින් වේගවත් වූ අතර, පද්ධතිය වලාකුළු (Cloud) තාක්ෂණයට අනුකූලව සකස් විය. ඒ සමඟම, තීරණාත්මක අංශවල පාරිභෝගික අහිමි වීමේ අනුපාතය (Churn) 11% කින් පහත වැටී ස්ථාවර විය." 
+                                                        />
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* TAB 2: DEEP DIVE ANALYSIS */}
+                                {activeTab === 'deep' && (
+                                    <section className="space-y-6 print-active-tab animate-fadeIn">
+                                        <div className="border-b border-slate-800 pb-3">
+                                            <h3 className="text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2">
+                                                <span className="text-emerald-500">🏢</span>
+                                                <Trans en="Core Theoretical Deep Dive" si="මූලික න්‍යායාත්මක විශ්ලේෂණය" />
+                                            </h3>
+                                            <p className="text-xs text-slate-400 mt-1">
+                                                <Trans en="An interactive look at the primary organizational conflicts of Module 6" si="6 වන මොඩියුලයේ ප්‍රධාන සංවිධාන න්‍යායාත්මක ගැටුම් පිළිබඳ සවිස්තරාත්මක අධ්‍යයනය" />
+                                            </p>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            {[
+                                                {
+                                                    title: "TNA Framework: Capability ('Can't Do') vs. Motivation ('Won't Do')",
+                                                    siTitle: "TNA රාමුව: හැකියාවන් නොමැතිකම ('Can't Do') සහ අභිප්‍රේරණ ගැටලු ('Won't Do')",
+                                                    desc: "A failure to perform is either a cognitive deficit (needs education and structured onboarding) or systemic design blockages (requires incentives, organizational restructuring, or tool modifications). Traditional training only fixes 'Can't Do' and actively harms 'Won't Do' by inducing fatigue.",
+                                                    siDesc: "ක්‍රියාකාරීත්වය අඩාල වීම එක්කෝ කුසලතා මට්ටම අඩුකම නිසා සිදු වේ (මීට පුහුණුව අවශ්‍යයි) නැතහොත් පවතින දිරිගැන්වීමේ ක්‍රමවල දුර්වලතා නිසා සිදු වේ (මීට කොමිස් ක්‍රම වෙනස් කළ යුතුයි). අභිප්‍රේරණ ගැටලු ඇති අයට පුහුණුව දීමෙන් කාලය අපතේ යාම පමණක් සිදු වේ.",
+                                                    badge: "The Matrix Baseline",
+                                                    color: "border-l-emerald-500"
+                                                },
+                                                {
+                                                    title: "Pedagogy vs. Andragogy (The Adult Learning Paradigm Shift)",
+                                                    siTitle: "Pedagogy සහ Andragogy අතර වෙනස (වැඩිහිටි ඉගෙනුම් මූලධර්ම)",
+                                                    desc: "Unlike children (passive receivers, dependent curriculum), adult learners are self-directed, draw deeply upon active professional experience as baseline scaffolds, and require contextual learning focusing on direct practical problem solving.",
+                                                    siDesc: "ළමුන් ඉගෙන ගන්නා ආකාරයට වඩා වැඩිහිටියන් ඉගෙන ගන්නා ආකාරය වෙනස් ය. වැඩිහිටියන් ස්වයං-නියාමනය වන අතර, ඔවුන්ගේ වෘත්තීය අත්දැකීම් උපයෝගී කරගනිමින් ගැටලු විසඳීම සඳහා සෘජුව යොදාගත හැකි දේ ඉගෙන ගැනීමට කැමති ය.",
+                                                    badge: "Malcolm Knowles' Rules",
+                                                    color: "border-l-tech-500"
+                                                },
+                                                {
+                                                    title: "Direct On-the-Job (OJT) vs. Off-the-Job Balancing Methods",
+                                                    siTitle: "රැකියාව අතරතුර (OJT) සහ රැකියාවෙන් බැහැර පුහුණු ක්‍රමවේද",
+                                                    desc: "OJT leverages cognitive apprenticeship, job shadowing, and active performance structures, maximizing skills transference. Off-the-job training provides controlled cognitive space, removing high-risk operational pressures for initial baseline development.",
+                                                    siDesc: "රැකියාව අතරතුර පුහුණුව (OJT) මඟින් සේවා පරිසරය තුළම ප්‍රායෝගිකව අත්දැකීම් ලබමින් ඉගෙනීමට ඉඩ සලසයි. රැකියාවෙන් බැහැර පුහුණුව මඟින් වගකීම්වලින් තොර නිදහස් පරිසරයක මූලික න්‍යායාත්මක පදනම ගොඩනැඟීමට උපකාරී වේ.",
+                                                    badge: "Transference Mechanics",
+                                                    color: "border-l-indigo-500"
+                                                }
+                                            ].map((card, i) => (
+                                                <div key={i} className={`bg-slate-900/60 backdrop-blur-md border border-slate-800 border-l-4 ${card.color} p-5 sm:p-6 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:bg-slate-800/40 transition-all`}>
+                                                    <div className="space-y-2 flex-1">
+                                                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider bg-slate-950 px-2 py-0.5 rounded-md">{card.badge}</span>
+                                                        <h4 className="text-sm sm:text-base font-bold text-slate-200">
+                                                            <Trans en={card.title} si={card.siTitle} />
+                                                        </h4>
+                                                        <p className="text-xs text-slate-400 leading-relaxed">
+                                                            <Trans en={card.desc} si={card.siDesc} />
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* TAB 3: SCENARIO SUITE */}
+                                {activeTab === 'scenarios' && (
+                                    <section className="space-y-6 print-active-tab animate-fadeIn">
+                                        <div className="border-b border-slate-800 pb-3">
+                                            <h3 className="text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2">
+                                                <span className="text-emerald-500">🧪</span>
+                                                <Trans en="Real-World Sri Lankan Scenarios" si="ලංකාවේ කර්මාන්ත ඇසුරින් ප්‍රායෝගික අවස්ථා" />
+                                            </h3>
+                                            <p className="text-xs text-slate-400 mt-1">
+                                                <Trans en="Analyze 3 highly targeted business scenarios simulating T&D frameworks" si="6 වන මොඩියුලයේ සංකල්ප ඇසුරින් සැකසූ ප්‍රායෝගික ව්‍යාපාරික ගැටලු 3ක්" />
+                                            </p>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                            {[
+                                                {
+                                                    code: "Scenario A / අවස්ථාව 'A'",
+                                                    title: "Colombo Microservices Transit",
+                                                    siTitle: "කොළඹ මෘදුකාංග සංවර්ධන ආයතනයක්",
+                                                    issue: "A local software house shifts to cloud microservices. Senior engineers fail to adopt cloud-native practices, delaying deployment loops.",
+                                                    siIssue: "මෘදුකාංග ආයතනයක් ක්ලවුඩ් තාක්ෂණයට මාරු වන විට, ජ්‍යෙෂ්ඨ ඉංජිනේරුවන් නව ක්‍රමවේද අනුගමනය නොකිරීම නිසා පද්ධති දියත් කිරීම ප්‍රමාද විය.",
+                                                    diagnosis: "Capability deficit ('Can't Do') combined with adult learners reacting poorly to top-down lecture instruction.",
+                                                    siDiagnosis: "හැකියාවන්ගේ හිඟකම ('Can't Do') සහ සාම්ප්‍රදායික දේශන ක්‍රමවේද පිළිබඳ වැඩිහිටි ඉගෙනුම්කරුවන්ගේ ඇති අකමැත්ත.",
+                                                    solution: "Transition to a sandbox developer playground with autonomous goal pathways (Andragogy) under active OJT mentoring.",
+                                                    siSolution: "ප්‍රායෝගිකව අත්හදා බැලීම් කළ හැකි 'Sandbox' ක්‍රීඩාපිටියක් සමඟ ස්වයං-නියාමන OJT පුහුණු උපදේශක ක්‍රමවේදයක් ලබා දීම."
+                                                },
+                                                {
+                                                    code: "Scenario B / අවස්ථාව 'B'",
+                                                    title: "Katunayake Apparel Assembly",
+                                                    siTitle: "කටුනායක ඇඟලුම් කම්හලක්",
+                                                    issue: "High product defect rates spotted across a newly launched high-performance seamless apparel line in a massive export factory.",
+                                                    siIssue: "කටුනායක ඇඟලුම් කම්හලක නවතම නිපැයුම් පෙළක නිෂ්පාදන දෝෂ අනුපාතය වේගයෙන් ඉහළ ගියේය.",
+                                                    diagnosis: "Capability Gap on high-precision physical alignment metrics + lack of quick verification tools at workstations.",
+                                                    siDiagnosis: "නිරවද්‍යතා මිනුම් පිළිබඳ හැකියාවන්ගේ හිඟකම සහ සේවා ස්ථානයේදී ක්ෂණිකව දෝෂ පරීක්ෂා කිරීමේ මෙවලම් නොමැතිකම.",
+                                                    solution: "Implement structured Cognitive Apprenticeship (OJT) with master tailors shadowing line workers and immediate visual checklists.",
+                                                    siSolution: "ප්‍රවීණ කාර්මික ශිල්පීන් ලවා සෘජුවම වැඩබිම තුළ (OJT) පුහුණුවක් සහ සරල දෘශ්‍ය පිරික්සුම් ලැයිස්තු ලබා දීම."
+                                                },
+                                                {
+                                                    code: "Scenario C / අවස්ථාව 'C'",
+                                                    title: "Sri Lankan Private Bank Core",
+                                                    siTitle: "ශ්‍රී ලංකාවේ පෞද්ගලික බැංකුවක්",
+                                                    issue: "Branch personnel actively avoid onboarding walk-in retail customers onto the bank's newly developed digital mobile app.",
+                                                    siIssue: "බැංකු ශාඛා සේවකයින් පාරිභෝගිකයින්ව බැංකුවේ නවතම ජංගම යෙදුම (Mobile App) වෙත යොමු කිරීමෙන් සිතාමතාම වැළකී සිටියේය.",
+                                                    diagnosis: "Motivational barrier ('Won't Do'). Commission metrics solely rewarded high-value, manual fixed-deposit paperwork.",
+                                                    siDiagnosis: "අභිප්‍රේරණ ගැටලුව ('Won't Do'). සේවකයින්ගේ කොමිස් ක්‍රමය සකසා තිබුණේ ශාඛාව තුළ සිදුකරන ස්ථාවර තැන්පතු කටයුතුවලට පමණි.",
+                                                    solution: "Realign monthly branch performance incentives. Stop app usage webinars, and incentivize digital adoption rates directly.",
+                                                    siSolution: "මාසික දිරි දීමනා ක්‍රමය ඩිජිටල් ගනුදෙනු අනුපාතයට සෘජුවම සම්බන්ධ කිරීම. අනවශ්‍ය දේශන පන්ති නතර කිරීම."
+                                                }
+                                            ].map((scenario, index) => (
+                                                <div key={index} className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between hover:border-emerald-500/30 transition-all">
+                                                    <div>
+                                                        <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest block mb-1">{scenario.code}</span>
+                                                        <h4 className="text-sm font-bold text-slate-100 mb-4">
+                                                            <Trans en={scenario.title} si={scenario.siTitle} />
+                                                        </h4>
+                                                        
+                                                        <div className="space-y-3.5 text-xs text-slate-300">
+                                                            <div>
+                                                                <strong className="text-rose-400 block mb-0.5"><Trans en="The Bottleneck:" si="ප්‍රධාන ගැටලුව:" /></strong>
+                                                                <Trans en={scenario.issue} si={scenario.siIssue} />
+                                                            </div>
+                                                            <div className="border-t border-slate-800 pt-2.5">
+                                                                <strong className="text-amber-400 block mb-0.5"><Trans en="TNA Diagnostic:" si="TNA විශ්ලේෂණය:" /></strong>
+                                                                <Trans en={scenario.diagnosis} si={scenario.siDiagnosis} />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="mt-5 pt-3 border-t border-slate-800 bg-slate-950/40 -mx-5 -mb-5 p-5 rounded-b-2xl">
+                                                        <strong className="text-emerald-400 text-xs block mb-1"><Trans en="Action Plan / ක්‍රියාකාරී සැලැස්ම:" si="ක්‍රියාකාරී සැලැස්ම:" /></strong>
+                                                        <p className="text-xs text-slate-300">
+                                                            <Trans en={scenario.solution} si={scenario.siSolution} />
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* TAB 4: DIAGNOSTIC LAB (Calculators with dynamic LaTeX math typesetting) */}
+                                {activeTab === 'diag' && (
+                                    <section className="space-y-6 print-active-tab animate-fadeIn">
+                                        <div className="border-b border-slate-800 pb-3">
+                                            <h3 className="text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2">
+                                                <span className="text-emerald-500">⚙️</span>
+                                                <Trans en="Interactive Diagnostic Metrics Lab" si="මිණුම් හා ආයෝජන ප්‍රතිලාභ විද්‍යාගාරය" />
+                                            </h3>
+                                            <p className="text-xs text-slate-400 mt-1">
+                                                <Trans en="Live-update calculators demonstrating Level 4 ROI & Bench Strength Succession Planning" si="පුහුණුවේ ආයෝජන ප්‍රතිලාභය (ROI) සහ අනුප්‍රාප්තික සූදානම්තාව (BSR) ගණනය කරන්න" />
+                                            </p>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                            
+                                            {/* Calculator 1: Kirkpatrick Level 4 ROI */}
+                                            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 sm:p-6 flex flex-col justify-between">
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <h4 className="text-xs sm:text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                                                            <span className="text-tech-400">📊</span>
+                                                            <Trans en="Training Return on Investment (ROI)" si="පුහුණු ආයෝජන ප්‍රතිලාභය (ROI)" />
+                                                        </h4>
+                                                        <span className="text-[10px] bg-tech-500/10 text-tech-400 font-bold px-2.5 py-0.5 rounded-full">Level 4 Result</span>
+                                                    </div>
+
+                                                    <div className="p-4 bg-slate-950/60 border border-slate-800/80 rounded-xl space-y-2 mb-6">
+                                                        <div className="text-xs font-bold text-slate-400 mb-1">
+                                                            <Trans en="Standard Kirkpatrick Level 4 Formula Matrix:" si="Kirkpatrick Level 4 සම්මත ගණිතමය සූත්‍රය:" />
+                                                        </div>
+                                                        <div className="text-slate-100 text-xs overflow-x-auto no-scrollbar py-1">
+                                                            {"$$\\text{ROI} = \\left( \\frac{\\text{Net Financial Benefits}}{\\text{Total Training Costs}} \\right) \\times 100\\%$$"}
+                                                            {"$$\\text{Net Financial Benefits} = \\text{Gross Value Created} - \\text{Total Training Costs}$$"}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Inputs */}
+                                                    <div className="space-y-5">
+                                                        <div>
+                                                            <div className="flex flex-col sm:flex-row sm:justify-between text-xs font-semibold mb-2 gap-1">
+                                                                <Trans en="Total Training Cost (LKR)" si="මුළු පුහුණු පිරිවැය (රුපියල්)" />
+                                                                <span className="text-tech-400 font-mono font-bold text-right">රු. {roiCost.toLocaleString()}</span>
+                                                            </div>
+                                                            <input 
+                                                                type="range" 
+                                                                min="200000" 
+                                                                max="5000000" 
+                                                                step="50000"
+                                                                value={roiCost} 
+                                                                onChange={(e) => setRoiCost(Number(e.target.value))}
+                                                                className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                                                                style={{ minHeight: '30px' }}
+                                                            />
+                                                        </div>
+
+                                                        <div>
+                                                            <div className="flex flex-col sm:flex-row sm:justify-between text-xs font-semibold mb-2 gap-1">
+                                                                <Trans en="Gross Financial Benefits / Value Created (LKR)" si="ලැබුණු මුළු මූල්‍යමය වාසිය (රුපියල්)" />
+                                                                <span className="text-emerald-400 font-mono font-bold text-right font-sinhala">රු. {roiGain.toLocaleString()}</span>
+                                                            </div>
+                                                            <input 
+                                                                type="range" 
+                                                                min="500000" 
+                                                                max="15000000" 
+                                                                step="100000"
+                                                                value={roiGain} 
+                                                                onChange={(e) => setRoiGain(Number(e.target.value))}
+                                                                className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                                                                style={{ minHeight: '30px' }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Output Metrics */}
+                                                <div className="mt-8 pt-6 border-t border-slate-800/80">
+                                                    {(() => {
+                                                        const netBenefits = roiGain - roiCost;
+                                                        const calculatedRoi = Math.round((netBenefits / roiCost) * 100);
+                                                        const isLow = calculatedRoi < 30;
+                                                        const isNegative = calculatedRoi < 0;
+
+                                                        return (
+                                                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                                                <div className="w-full sm:w-auto text-left">
+                                                                    <span className="text-xs text-slate-400 font-bold block mb-0.5"><Trans en="ROI SCORE" si="ආයෝජන ප්‍රතිලාභය" /></span>
+                                                                    <span className={`text-3xl sm:text-4xl font-extrabold tracking-tight ${isNegative ? 'text-rose-500' : isLow ? 'text-amber-500' : 'text-emerald-400'}`}>
+                                                                        {calculatedRoi}%
+                                                                    </span>
+                                                                </div>
+
+                                                                <div className={`w-full sm:flex-1 p-3.5 rounded-xl border ${isNegative ? 'bg-rose-950/20 border-rose-500/20 text-rose-400' : isLow ? 'bg-amber-950/20 border-amber-500/20 text-amber-400' : 'bg-emerald-950/20 border-emerald-500/20 text-emerald-400'} text-xs font-semibold flex items-start gap-2.5`}>
+                                                                    <span className="mt-0.5">{isNegative ? '❌' : isLow ? '⚠️' : '✅'}</span>
+                                                                    <p className="leading-snug">
+                                                                        {isNegative ? (
+                                                                            <Trans en="CRITICAL: Negative ROI. This initiative lost money. Revise instructional design structures." si="අන්තරායයි: ඍණාත්මක ප්‍රතිලාභයකි. වැය කළ මුදල පවා අහිමි වී ඇත. පුහුණු උපායමාර්ගය වෙනස් කරන්න." />
+                                                                        ) : isLow ? (
+                                                                            <Trans en="WARNING: Marginal ROI. Low commercial justification. Reassess training design elements." si="අවවාදයයි: ලැබී ඇත්තේ ඉතා අඩු ප්‍රතිලාභයකි. පුහුණුවේ ක්‍රමවේද නැවත විමසා බලන්න." />
+                                                                        ) : (
+                                                                            <Trans en="OPTIMAL: Exceptional financial payoff. Clear organizational validation of workforce enhancement." si="විශිෂ්ටයි: ඉහළ මූල්‍ය ප්‍රතිලාභයකි. ආයතනයේ මානව ප්‍රාග්ධනය සාර්ථකව ඉහළ නංවා ඇත." />
+                                                                        )}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })()}
+                                                </div>
+                                            </div>
+
+                                            {/* Calculator 2: Succession & Bench Strength Ratio (BSR) */}
+                                            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 sm:p-6 flex flex-col justify-between">
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <h4 className="text-xs sm:text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                                                            <span className="text-emerald-400">👑</span>
+                                                            <Trans en="Bench Strength Ratio (BSR)" si="අනුප්‍රාප්තික සූදානම්තා අනුපාතය (BSR)" />
+                                                        </h4>
+                                                        <span className="text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2.5 py-0.5 rounded-full">Future-Proofing</span>
+                                                    </div>
+
+                                                    <div className="p-4 bg-slate-950/60 border border-slate-800/80 rounded-xl space-y-2 mb-6">
+                                                        <div className="text-xs font-bold text-slate-400 mb-1">
+                                                            <Trans en="Leadership Succession Formula Matrix:" si="නායකත්ව අනුප්‍රාප්තික සූදානම්තා සූත්‍රය:" />
+                                                        </div>
+                                                        <div className="text-slate-100 text-xs overflow-x-auto no-scrollbar py-1">
+                                                            {"$$\\text{BSR} = \\frac{\\text{Succession-Ready Candidates}}{\\text{Critical Leadership Roles}}$$"}
+                                                            {"$$\\text{Target Performance Indicator} \\ge 2.0$$"}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Inputs */}
+                                                    <div className="space-y-5">
+                                                        <div>
+                                                            <div className="flex flex-col sm:flex-row sm:justify-between text-xs font-semibold mb-2 gap-1">
+                                                                <Trans en="Critical Leadership Roles" si="තීරණාත්මක කළමනාකාරීත්ව තනතුරු" />
+                                                                <span className="text-tech-400 font-mono font-bold text-right">{criticalRoles} Roles</span>
+                                                            </div>
+                                                            <input 
+                                                                type="range" 
+                                                                min="2" 
+                                                                max="15" 
+                                                                value={criticalRoles} 
+                                                                onChange={(e) => setCriticalRoles(Number(e.target.value))}
+                                                                className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                                                                style={{ minHeight: '30px' }}
+                                                            />
+                                                        </div>
+
+                                                        <div>
+                                                            <div className="flex flex-col sm:flex-row sm:justify-between text-xs font-semibold mb-2 gap-1">
+                                                                <Trans en="Fully-Qualified, Succession-Ready Candidates" si="වැඩ කිරීමට සූදානම් (HiPo) අපේක්ෂකයින් ගණන" />
+                                                                <span className="text-emerald-400 font-mono font-bold text-right">{readyCandidates} Candidates</span>
+                                                            </div>
+                                                            <input 
+                                                                type="range" 
+                                                                min="1" 
+                                                                max="30" 
+                                                                value={readyCandidates} 
+                                                                onChange={(e) => setReadyCandidates(Number(e.target.value))}
+                                                                className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                                                                style={{ minHeight: '30px' }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Output Metrics */}
+                                                <div className="mt-8 pt-6 border-t border-slate-800/80">
+                                                    {(() => {
+                                                        const calculatedBsr = (readyCandidates / criticalRoles).toFixed(2);
+                                                        const isLow = parseFloat(calculatedBsr) < 1.0;
+                                                        const isTarget = parseFloat(calculatedBsr) >= 2.0;
+
+                                                        return (
+                                                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                                                <div className="w-full sm:w-auto text-left">
+                                                                    <span className="text-xs text-slate-400 font-bold block mb-0.5"><Trans en="BSR SCORE" si="BSR අනුපාතය" /></span>
+                                                                    <span className={`text-3xl sm:text-4xl font-extrabold tracking-tight ${isLow ? 'text-rose-500' : isTarget ? 'text-emerald-400' : 'text-amber-500'}`}>
+                                                                        {calculatedBsr}
+                                                                    </span>
+                                                                </div>
+
+                                                                <div className={`w-full sm:flex-1 p-3.5 rounded-xl border ${isLow ? 'bg-rose-950/20 border-rose-500/20 text-rose-400' : isTarget ? 'bg-emerald-950/20 border-emerald-500/20 text-emerald-400' : 'bg-amber-950/20 border-amber-500/20 text-amber-400'} text-xs font-semibold flex items-start gap-2.5`}>
+                                                                    <span className="mt-0.5">{isLow ? '🚨' : isTarget ? '🌟' : '⚡'}</span>
+                                                                    <p className="leading-snug">
+                                                                        {isLow ? (
+                                                                            <Trans en="CRITICAL SUCCESION RISK: BSR below 1.0. Role vacancies will cause immense executive instability." si="අතිශය අවදානම්: BSR අගය 1.0ට වඩා අඩුයි. ප්‍රධාන තනතුරක් පුරප්පාඩු වුවහොත් ආයතනය බිඳ වැටෙනු ඇත." />
+                                                                        ) : isTarget ? (
+                                                                            <Trans en="FUTURE-PROOFED: BSR matches target (>= 2.0). Strong leadership pipeline; solid succession stability assured." si="පරිපූර්ණයි: ඉලක්කගත BSR අගය (>= 2.0) ලබාගෙන ඇත. ඕනෑම හදිසි තනතුරු පුරප්පාඩුවකට සුදුස්සන් සූදානම්ව සිටී." />
+                                                                        ) : (
+                                                                            <Trans en="VULNERABLE SUCCESSION: Bench depth is positive but lacks redundancy. Scale leadership development academies." si="සතුටුදායකයි: සූදානම්තාවක් ඇතත් එය ප්‍රමාණවත් නොවේ. අතිරේක අපේක්ෂකයින් පුහුණු කරන්න." />
+                                                                        )}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })()}
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* TAB 5: SYSTEM SIMULATION 1 (Architecture Demo) */}
+                                {activeTab === 'sim1' && (
+                                    <section className="space-y-6 print-active-tab animate-fadeIn">
+                                        <div className="border-b border-slate-800 pb-3">
+                                            <h3 className="text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2">
+                                                <span className="text-emerald-500">🖥️</span>
+                                                <Trans en="System Simulation 1: Talent Architecture visualizer" si="පළමු අනුකරණය: පුහුණු ආයතනික ව්‍යුහය" />
+                                            </h3>
+                                            <p className="text-xs text-slate-400 mt-1">
+                                                <Trans en="Reconfigure the organizational L&D structure and observe operational flow changes in real-time" si="ආයතනික පුහුණු ව්‍යුහය වෙනස් කර එය සජීවීව ක්‍රියාත්මක වන අයුරු නරඹන්න" />
+                                            </p>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                                            {/* Select Architecture */}
+                                            <div className="lg:col-span-4 bg-slate-900/60 border border-slate-800 p-5 rounded-2xl space-y-4">
+                                                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                                                    <Trans en="Select Training Architecture" si="පුහුණු ආකෘතිය තෝරන්න" />
+                                                </h4>
+
+                                                {[
+                                                    { id: 'centralized', title: 'Centralized Academy', si: 'මධ්‍යගත පුහුණු ඇකඩමිය', desc: 'Single HQ unit control. High control but slow local responsiveness.' },
+                                                    { id: 'decentralized', title: 'Decentralized Units', si: 'විමධ්‍යගත අංශ', desc: 'Isolated local execution. Fast response but duplicate costs.' },
+                                                    { id: 'federated', title: 'Federated Ecosystem', si: 'සම්බන්ධීකරණ පද්ධතිය', desc: 'Shared core guidelines with customized local execution teams.' }
+                                                ].map((opt) => (
+                                                    <button
+                                                        key={opt.id}
+                                                        onClick={() => handleArchChange(opt.id)}
+                                                        className={`w-full p-4 rounded-xl text-left border transition-all ${
+                                                            archMode === opt.id
+                                                            ? 'bg-emerald-500/10 border-emerald-500/60 text-emerald-400 font-semibold'
+                                                            : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                                                        }`}
+                                                        style={{ minHeight: '80px' }}
+                                                    >
+                                                        <span className="text-xs font-bold block">
+                                                            <Trans en={opt.title} si={opt.si} />
+                                                        </span>
+                                                        <span className="text-[10px] text-slate-500 block mt-1 leading-normal">
+                                                            <Trans en={opt.desc} si={opt.desc === 'Single HQ unit control. High control but slow local responsiveness.' ? 'ප්‍රධාන කාර්යාලය මඟින් සියල්ල මෙහෙයවයි. පාලනය උපරිම වන නමුත් ක්‍රියාවලිය ප්‍රමාද වේ.' : opt.desc === 'Isolated local execution. Fast response but duplicate costs.' ? 'එක් එක් අංශ මඟින් තනිව ක්‍රියාත්මක කරයි. වේගවත් නමුත් වියදම අධිකය.' : 'පොදු මූලධර්ම මත පදනම්ව එක් එක් අංශ තමන්ට ගැලපෙන පරිදි පුහුණුව ලබා දෙයි.'} />
+                                                        </span>
+                                                    </button>
+                                                ))}
+                                            </div>
+
+                                            {/* Interactive Visualizer Canvas */}
+                                            <div className="lg:col-span-8 bg-slate-900/60 border border-slate-800 rounded-2xl p-6 min-h-[350px] flex flex-col justify-between relative overflow-hidden">
+                                                
+                                                {/* Simulated Loading Glass Block */}
+                                                {isSim1Processing && (
+                                                    <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center gap-3">
+                                                        <span className="h-10 w-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></span>
+                                                        <span className="text-xs font-bold text-emerald-400 font-mono tracking-widest uppercase text-center">
+                                                            <Trans en="Processing Architecture..." si="පද්ධති ව්‍යුහය සැකසෙමින් පවතී..." />
+                                                        </span>
+                                                    </div>
+                                                )}
+
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-6">
+                                                        <span className="text-[10px] bg-slate-950 border border-slate-800 text-slate-400 font-bold px-3 py-1 rounded-md uppercase tracking-wider">
+                                                            <Trans en="System Layout Screen" si="පද්ධති සිතියම" />
+                                                        </span>
+                                                        <span className="text-xs text-slate-500 font-semibold uppercase">
+                                                            <Trans en="Flow Speed: Dynamic" si="ප්‍රවාහ වේගය: ගතිකයි" />
+                                                        </span>
+                                                    </div>
+
+                                                    {/* Visual State Render based on option */}
+                                                    <div className="flex flex-col items-center justify-center py-6">
+                                                        {archMode === 'centralized' && (
+                                                            <div className="space-y-6 w-full max-w-sm animate-fadeIn">
+                                                                {/* HQ Node */}
+                                                                <div className="bg-emerald-500 text-slate-950 font-extrabold text-xs text-center py-3 rounded-xl mx-auto w-32 border border-emerald-400 shadow-lg shadow-emerald-500/20">
+                                                                    CENTRAL HQ ACADEMY
+                                                                </div>
+                                                                {/* Connection Lines */}
+                                                                <div className="flex justify-around items-center h-10 w-full relative">
+                                                                    <div className="absolute top-0 h-10 w-0.5 bg-emerald-500/30 left-1/2"></div>
+                                                                    <div className="absolute top-1/2 h-0.5 bg-emerald-500/30 w-1/2"></div>
+                                                                </div>
+                                                                {/* Department Nodes */}
+                                                                <div className="flex justify-between gap-2">
+                                                                    {['Sales Team', 'Engineering', 'Operations'].map((dept, idx) => (
+                                                                        <div key={idx} className="bg-slate-950 border border-slate-800 p-2 rounded-lg text-[10px] text-center flex-1 text-slate-400">
+                                                                            {dept}
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                                <div className="text-center text-[10px] text-rose-400 bg-rose-950/20 border border-rose-500/20 p-2 rounded-lg">
+                                                                    <Trans en="Critical issue: High bottlenecks at central unit." si="බාධාව: ප්‍රධාන කාර්යාලය සමඟ පමණක් සම්බන්ධ වීමෙන් ප්‍රමාද වීම් සිදුවේ." />
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {archMode === 'decentralized' && (
+                                                            <div className="space-y-6 w-full max-w-md animate-fadeIn">
+                                                                <div className="flex justify-between gap-4">
+                                                                    {[
+                                                                        { name: 'Silo Sales', col: 'border-rose-500/30 text-rose-400' },
+                                                                        { name: 'Silo Engineering', col: 'border-amber-500/30 text-amber-400' },
+                                                                        { name: 'Silo Operations', col: 'border-indigo-500/30 text-indigo-400' }
+                                                                    ].map((silo, idx) => (
+                                                                        <div key={idx} className={`bg-slate-950 border ${silo.col} p-4 rounded-xl flex-1 text-center space-y-3`}>
+                                                                            <div className="text-xs font-bold">{silo.name}</div>
+                                                                            <div className="text-[9px] bg-slate-900 py-1 rounded text-slate-500">Custom Curriculum</div>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                                <div className="text-center text-[10px] text-amber-400 bg-amber-950/20 border border-amber-500/20 p-2 rounded-lg">
+                                                                    <Trans en="Critical issue: Massive redundant budget expenditure." si="බාධාව: වෙන වෙනම සිදුකිරීම නිසා දැවැන්ත මුදලක් අපතේ යයි." />
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {archMode === 'federated' && (
+                                                            <div className="space-y-4 w-full max-w-sm animate-fadeIn">
+                                                                {/* Shared Core guidelines Center */}
+                                                                <div className="bg-tech-500 text-slate-950 font-extrabold text-xs text-center py-2.5 rounded-xl mx-auto w-40 border border-tech-400 shadow-lg shadow-tech-500/20">
+                                                                    SHARED CORE FRAMEWORK
+                                                                </div>
+                                                                {/* Connection Lines (Federated bridges) */}
+                                                                <div className="flex justify-around items-center h-8 w-full relative">
+                                                                    <div className="absolute top-0 h-8 w-0.5 bg-tech-500/40 left-1/2"></div>
+                                                                    <div className="absolute top-1/2 h-0.5 bg-tech-500/40 w-3/4"></div>
+                                                                </div>
+                                                                {/* Dynamic Cohorts */}
+                                                                <div className="flex justify-between gap-3">
+                                                                    {[
+                                                                        { name: 'Sales Hub', type: 'Gamified' },
+                                                                        { name: 'Tech Guild', type: 'Sandbox OJT' },
+                                                                        { name: 'Ops Tribe', type: 'Apprentice' }
+                                                                    ].map((cohort, idx) => (
+                                                                        <div key={idx} className="bg-slate-950 border border-emerald-500/30 p-2.5 rounded-xl text-center flex-1 space-y-1">
+                                                                            <div className="text-[10px] font-bold text-slate-200">{cohort.name}</div>
+                                                                            <div className="text-[8px] text-emerald-400 font-mono">{cohort.type}</div>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                                <div className="text-center text-[10px] text-emerald-400 bg-emerald-950/20 border border-emerald-500/20 p-2 rounded-lg">
+                                                                    <Trans en="OPTIMAL HYBRID: Synergistic cost profile & instant speed." si="පරිපූර්ණයි: අවම වියදමකින් ඉතා වේගවත්ව සේවකයින්ට ගැලපෙන සේවාවක් දේ." />
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* System Health Indicators */}
+                                                <div className="border-t border-slate-800 pt-4 grid grid-cols-3 gap-2 text-center text-xs">
+                                                    <div className="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/60">
+                                                        <span className="text-slate-500 text-[10px] block mb-0.5"><Trans en="Strategic Control" si="පාලන මට්ටම" /></span>
+                                                        <span className="font-bold text-slate-300">
+                                                            {archMode === 'centralized' ? 'High' : archMode === 'decentralized' ? 'Low' : 'Optimal'}
+                                                        </span>
+                                                    </div>
+                                                    <div className="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/60">
+                                                        <span className="text-slate-500 text-[10px] block mb-0.5"><Trans en="Response Speed" si="වේගවත්භාවය" /></span>
+                                                        <span className="font-bold text-slate-300">
+                                                            {archMode === 'centralized' ? 'Slow' : archMode === 'decentralized' ? 'Instant' : 'Agile'}
+                                                        </span>
+                                                    </div>
+                                                    <div className="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/60">
+                                                        <span className="text-slate-500 text-[10px] block mb-0.5"><Trans en="Cost Efficiency" si="පිරිවැය ඉතිරිය" /></span>
+                                                        <span className="font-bold text-slate-300">
+                                                            {archMode === 'centralized' ? 'Moderate' : archMode === 'decentralized' ? 'Critical Wastage' : 'Excellent'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* TAB 6: SYSTEM SIMULATION 2 (The Cascade with LaTeX dynamic outputs) */}
+                                {activeTab === 'sim2' && (
+                                    <section className="space-y-6 print-active-tab animate-fadeIn">
+                                        <div className="border-b border-slate-800 pb-3">
+                                            <h3 className="text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2">
+                                                <span className="text-emerald-500">🎯</span>
+                                                <Trans en="System Simulation 2: Strategic Cascade" si="දෙවන අනුකරණය: උපායමාර්ගික තීරණ ප්‍රවාහය" />
+                                            </h3>
+                                            <p className="text-xs text-slate-400 mt-1">
+                                                <Trans en="See how high-level strategic objectives cascade dynamically into skill paths and ROI KPIs" si="ප්‍රධාන උපායමාර්ගික තීරණ පහළ මට්ටමේ කුසලතා සංවර්ධනයට බලපාන අයුරු නරඹන්න" />
+                                            </p>
+                                        </div>
+
+                                        {/* Cascade Trigger Goals */}
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            {[
+                                                { id: 'cloud', title: 'Accelerate Digital Product Delivery', si: 'ඩිජිටල් නිපැයුම් වේගවත් කිරීම', desc: 'Focuses on architectural and technological advancement.' },
+                                                { id: 'retention', title: 'Halve Core Customer Churn', si: 'පාරිභෝගික අහිමි වීම වැළැක්වීම', desc: 'Prioritizes relationship capability and front-line metrics.' },
+                                                { id: 'factory', title: 'Scale Factory Operational Efficiency', si: 'කර්මාන්තශාලා කාර්යක්ෂමතාව ඉහළ නැංවීම', desc: 'Focuses on waste reduction, safety standards, and performance.' }
+                                            ].map((goal) => (
+                                                <button
+                                                    key={goal.id}
+                                                    onClick={() => {
+                                                        setSelectedGoal(goal.id);
+                                                        showToast(`Aligned to strategic goal: ${goal.title}`, `උපායමාර්ගික ඉලක්කය වෙනස් කරන ලදී.`);
+                                                    }}
+                                                    className={`p-4 rounded-2xl text-left border transition-all ${
+                                                        selectedGoal === goal.id
+                                                        ? 'bg-tech-500/10 border-tech-500/60 text-tech-400 font-semibold'
+                                                        : 'bg-slate-900/40 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                                                    }`}
+                                                    style={{ minHeight: '80px' }}
+                                                >
+                                                    <span className="text-xs font-bold block">
+                                                        <Trans en={goal.title} si={goal.si} />
+                                                    </span>
+                                                    <span className="text-[10px] text-slate-500 block mt-1 leading-normal">
+                                                        <Trans en={goal.desc} si={goal.id === 'cloud' ? 'තාක්ෂණික හා වලාකුළු කුසලතා කෙරෙහි අවධානය යොමු කරයි.' : goal.id === 'retention' ? 'පාරිභෝගික සේවා නිලධාරීන්ගේ කුසලතා ඉලක්ක කරයි.' : 'නිෂ්පාදන දෝෂ අවම කිරීම සහ ආරක්ෂාව කෙරෙහි අවධානය යොමු කරයි.'} />
+                                                    </span>
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        {/* Cascading Logic Columns */}
+                                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                            
+                                            {/* Column 1: Core TNA Split */}
+                                            <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl space-y-6">
+                                                <h4 className="text-xs font-bold text-slate-200 border-b border-slate-800 pb-2 flex items-center gap-2">
+                                                    <span className="text-rose-400">📊</span>
+                                                    <Trans en="Step 1: Diagnostic Assessment Split" si="1 පියවර: TNA පරතරයන් සැකසීම" />
+                                                </h4>
+
+                                                <div className="space-y-5">
+                                                    <div>
+                                                        <div className="flex justify-between text-xs font-semibold mb-2">
+                                                            <Trans en="Skill Competency Depth" si="සේවකයින්ගේ කුසලතා මට්ටම" />
+                                                            <span className="text-tech-400 font-mono font-bold">{readinessSlider}%</span>
+                                                        </div>
+                                                        <input 
+                                                            type="range" 
+                                                            min="10" 
+                                                            max="100" 
+                                                            value={readinessSlider} 
+                                                            onChange={(e) => setReadinessSlider(Number(e.target.value))}
+                                                            className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                                                            style={{ minHeight: '30px' }}
+                                                        />
+                                                        <span className="text-[9px] text-slate-500 block mt-1">
+                                                            <Trans en="Drives 'Can't Do' learning curve speed" si="'Can't Do' (කුසලතා) පරතරය පාලනය කරයි." />
+                                                        </span>
+                                                    </div>
+
+                                                    <div>
+                                                        <div className="flex justify-between text-xs font-semibold mb-2">
+                                                            <Trans en="Incentive Realignment Value" si="දිරි දීමනා ක්‍රමයේ ගැලපීම" />
+                                                            <span className="text-emerald-400 font-mono font-bold">{incentiveSlider}%</span>
+                                                        </div>
+                                                        <input 
+                                                            type="range" 
+                                                            min="10" 
+                                                            max="100" 
+                                                            value={incentiveSlider} 
+                                                            onChange={(e) => setIncentiveSlider(Number(e.target.value))}
+                                                            className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                                                            style={{ minHeight: '30px' }}
+                                                        />
+                                                        <span className="text-[9px] text-slate-500 block mt-1">
+                                                            <Trans en="Eliminates 'Won't Do' active resistance" si="'Won't Do' (අකමැත්ත) පරතරය පාලනය කරයි." />
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Column 2: Cascaded Active Workflow */}
+                                            <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl space-y-4">
+                                                <h4 className="text-xs font-bold text-slate-200 border-b border-slate-800 pb-2 flex items-center gap-2">
+                                                    <span className="text-amber-400">⚡</span>
+                                                    <Trans en="Step 2: Training Implementation Strategy" si="2 පියවර: ක්‍රියාත්මක වන පුහුණු ක්‍රමය" />
+                                                </h4>
+
+                                                <div className="space-y-4 text-xs">
+                                                    <div className="bg-slate-950/60 p-3 rounded-xl border border-slate-800">
+                                                        <strong className="text-slate-400 block mb-1">
+                                                            <Trans en="Design Path Selected:" si="තෝරාගත් ක්‍රමවේදය:" />
+                                                        </strong>
+                                                        <p className="text-slate-300">
+                                                            {selectedGoal === 'cloud' && <Trans en="Andragogical Sandbox Environments + Mentoring Guilds." si="අපේක්ෂකයින් විසින්ම හසුරුවන ප්‍රායෝගික වටපිටාවන් සහ OJT මඟපෙන්වීම්." />}
+                                                            {selectedGoal === 'retention' && <Trans en="Bespoke Gamified Learning Modules + Customer Care shadowing." si="පාරිභෝගික සබඳතා වර්ධනය කෙරෙන OJT පුහුණු සැසි." />}
+                                                            {selectedGoal === 'factory' && <Trans en="Cognitive Apprenticeship structures paired with live safety checklists." si="වැඩබිම තුළම කෙරෙන OJT පුහුණුව සහ සජීවී පිරික්සුම් ලැයිස්තු." />}
+                                                        </p>
+                                                    </div>
+
+                                                    <div className="bg-slate-950/60 p-3 rounded-xl border border-slate-800">
+                                                        <strong className="text-slate-400 block mb-1">
+                                                            <Trans en="Adult Learning Scaffold:" si="වැඩිහිටි ඉගෙනුම් පදනම:" />
+                                                        </strong>
+                                                        <p className="text-slate-300">
+                                                            {selectedGoal === 'cloud' && <Trans en="Leveraging existing legacy code patterns as reference structures." si="පැරණි පරිගණක කේත රටා නව තාක්ෂණය සමඟ සසඳමින් ඉගෙනීම." />}
+                                                            {selectedGoal === 'retention' && <Trans en="Analyzing past churned customers as live diagnostic case puzzles." si="අතීතයේ අහිමි වූ පාරිභෝගිකයින් පිළිබඳව සිද්ධි අධ්‍යයන පැවැත්වීම." />}
+                                                            {selectedGoal === 'factory' && <Trans en="Translating muscle-memory into standardized industrial actions." si="කාලාන්තරයක් තිස්සේ ලබාගත් ප්‍රායෝගික කාර්මික පළපුරුද්ද උපයෝගී කර ගැනීම." />}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Column 3: Interactive Cascade Outputs (With dynamic formulas) */}
+                                            <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between">
+                                                <div>
+                                                    <h4 className="text-xs font-bold text-slate-200 border-b border-slate-800 pb-2 flex items-center gap-2">
+                                                        <span className="text-emerald-400">📈</span>
+                                                        <Trans en="Step 3: Projected Impact Metrics" si="3 පියවර: පුරෝකථනය කරන ලද ප්‍රතිඵල" />
+                                                    </h4>
+
+                                                    <div className="text-[10px] text-slate-400 space-y-1 mb-4 p-3 bg-slate-950/40 rounded-xl border border-slate-800/60">
+                                                        <div>{"$$\\text{Success Probability} = 0.6 \\cdot \\text{Competency} + 0.4 \\cdot \\text{Incentive}$$"}</div>
+                                                        <div className="pt-1.5 border-t border-slate-800/80">{"$$\\text{Time-to-Value (Days)} = \\max\\left(14, \\ \\text{round}\\left(90 - 0.5 \\cdot \\text{Comp} - 0.3 \\cdot \\text{Inc}\\right)\\right)$$"}</div>
+                                                    </div>
+
+                                                    <div className="space-y-4 my-4">
+                                                        <div className="flex justify-between items-center text-xs">
+                                                            <span className="text-slate-400"><Trans en="Kirkpatrick Level 4 Success Probability" si="පුහුණුව සාර්ථක වීමේ ප්‍රවණතාවය" /></span>
+                                                            <span className={`font-mono font-bold ${cascadeResults.colorClass}`}>{cascadeResults.successRate}%</span>
+                                                        </div>
+                                                        <div className="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
+                                                            <div className="bg-emerald-500 h-1.5 transition-all duration-300" style={{ width: `${cascadeResults.successRate}%` }}></div>
+                                                        </div>
+
+                                                        <div className="flex justify-between text-xs">
+                                                            <span className="text-slate-400"><Trans en="Estimated Days to Full Competency" si="පූර්ණ කුසලතා මට්ටම ලබාගැනීමට ගතවන කාලය" /></span>
+                                                            <span className="font-mono text-slate-200 font-bold">{cascadeResults.timeToValue} Days / දින</span>
+                                                        </div>
+
+                                                        <div className="flex justify-between text-xs">
+                                                            <span className="text-slate-400"><Trans en="Strategic Alignment Score" si="උපායමාර්ගික ගැලපීමේ අගය" /></span>
+                                                            <span className="font-mono text-slate-200 font-bold">{cascadeResults.alignmentMetric}%</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-slate-950/60 p-4 rounded-xl border border-slate-800 text-center">
+                                                    <span className="text-[10px] text-slate-500 font-bold uppercase block mb-1"><Trans en="SYSTEM DIAGNOSIS STATUS" si="පද්ධති තක්සේරු තත්ත්වය" /></span>
+                                                    <span className={`text-xs font-bold ${cascadeResults.colorClass}`}>
+                                                        {langMode === 'en' ? cascadeResults.classificationEn : cascadeResults.classificationSi}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* TAB 7: SYSTEM SIMULATION 3 (Workflow Sim) */}
+                                {activeTab === 'sim3' && (
+                                    <section className="space-y-6 print-active-tab animate-fadeIn">
+                                        <div className="border-b border-slate-800 pb-3">
+                                            <h3 className="text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2">
+                                                <span className="text-emerald-500">🔄</span>
+                                                <Trans en="System Simulation 3: Learning Workflow Visualizer" si="තෙවන අනුකරණය: පුහුණු සංවර්ධන ක්‍රියාවලි සංසන්දනය" />
+                                            </h3>
+                                            <p className="text-xs text-slate-400 mt-1">
+                                                <Trans en="Contrast the linear pedagogical ADDIE cycle with the modern agile, circular SAM model" si="සාම්ප්‍රදායික රේඛීය ADDIE ක්‍රියාවලිය සහ නවීන චක්‍රීය SAM ක්‍රියාවලිය සසඳන්න" />
+                                            </p>
+                                        </div>
+
+                                        {/* Workflow Toggles */}
+                                        <div className="flex justify-center mb-6">
+                                            <div className="bg-slate-900 border border-slate-800 p-1 rounded-xl flex gap-1">
+                                                <button 
+                                                    onClick={() => { setWorkflowType('addie'); setActiveWorkflowStep(0); }}
+                                                    className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
+                                                        workflowType === 'addie'
+                                                        ? 'bg-amber-500 text-slate-950 shadow-md animate-pulse'
+                                                        : 'text-slate-400 hover:text-slate-200'
+                                                    }`}
+                                                    style={{ minHeight: '40px' }}
+                                                >
+                                                    <Trans en="Pedagogical Linear ADDIE" si="සාම්ප්‍රදායික රේඛීය ADDIE ක්‍රියාවලිය" />
+                                                </button>
+                                                <button 
+                                                    onClick={() => { setWorkflowType('sam'); setActiveWorkflowStep(0); }}
+                                                    className={`px-5 py-2 rounded-lg text-xs font-bold transition-all ${
+                                                        workflowType === 'sam'
+                                                        ? 'bg-emerald-500 text-slate-950 shadow-md animate-pulse'
+                                                        : 'text-slate-400 hover:text-slate-200'
+                                                    }`}
+                                                    style={{ minHeight: '40px' }}
+                                                >
+                                                    <Trans en="Andragogical Agile SAM Cycle" si="නවීන වේගවත් චක්‍රීය SAM ක්‍රියාවලිය" />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Interactive Process Flow Map */}
+                                        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 sm:p-6">
+                                            
+                                            {/* Linear Render */}
+                                            {workflowType === 'addie' && (
+                                                <div className="space-y-8 animate-fadeIn">
+                                                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                                                        {[
+                                                            { step: "Analyze / විශ්ලේෂණය", desc: "Define business goals." },
+                                                            { step: "Design / සැලසුම්කරණය", desc: "Map learning outcomes." },
+                                                            { step: "Develop / සංවර්ධනය", desc: "Build standard slides & files." },
+                                                            { step: "Implement / ක්‍රියාත්මක කිරීම", desc: "Deliver in classrooms." },
+                                                            { step: "Evaluate / ඇගයීම", desc: "Final examination metrics." }
+                                                        ].map((item, idx) => (
+                                                            <button 
+                                                                key={idx}
+                                                                onClick={() => {
+                                                                    setActiveWorkflowStep(idx);
+                                                                    showToast(`ADDIE Stage: ${item.step}`, `ADDIE පියවර තෝරා ගන්නා ලදී.`);
+                                                                }}
+                                                                className={`p-3.5 rounded-xl text-left border transition-all ${
+                                                                    activeWorkflowStep === idx 
+                                                                    ? 'bg-amber-500/10 border-amber-500 text-amber-400 shadow-lg' 
+                                                                    : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:border-slate-700'
+                                                                }`}
+                                                                style={{ minHeight: '100px' }}
+                                                            >
+                                                                <div className="text-[9px] font-mono text-slate-500 font-bold mb-1">0{idx + 1}. STEP</div>
+                                                                <div className="text-[11px] font-extrabold block leading-tight">{item.step}</div>
+                                                                <div className="text-[9px] text-slate-500 mt-1.5 leading-snug">{item.desc}</div>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+
+                                                    <div className="bg-slate-950/60 p-5 rounded-xl border border-slate-800 text-xs space-y-2 animate-fadeIn">
+                                                        <strong className="text-amber-400 block mb-1"><Trans en="Selected Step In Focus:" si="සැලසුමේ සවිස්තරාත්මක විස්තරය:" /></strong>
+                                                        <p className="text-slate-300">
+                                                            {activeWorkflowStep === 0 && <Trans en="ADDIE Analysis: Extensive organizational scoping. Often takes months, creating massive separation between performance need and training delivery." si="පළමු පියවර: ගැඹුරු පුහුණු අවශ්‍යතා විශ්ලේෂණය. මාස කිහිපයක් ගතවන බැවින් අවශ්‍යතාවය මතු වූ සැනින් ක්‍රියාත්මක කළ නොහැක." />}
+                                                            {activeWorkflowStep === 1 && <Trans en="ADDIE Design: Highly formalized syllabus mapping. Inflexible to changes once initial architectural structure sign-off occurs." si="දෙවන පියවර: සම්පූර්ණ විෂය මාලාව ලේඛනගතව සැලසුම් කිරීම. ව්‍යාපාරික අවශ්‍යතා වෙනස් වුවහොත් වෙනස් කිරීම අසීරු වේ." />}
+                                                            {activeWorkflowStep === 2 && <Trans en="ADDIE Development: Creation of absolute linear content blocks. High risk of resource wastage if user groups require immediate customization." si="තෙවන පියවර: දේශන පත්‍රිකා සහ විද්‍යුත් පාඩම් සම්පූර්ණයෙන් සකස් කිරීම. ප්‍රායෝගික අවශ්‍යතාවලට අකර්යක්ෂම වුවහොත් මුදල් නාස්තියකි." />}
+                                                            {activeWorkflowStep === 3 && <Trans en="ADDIE Implementation: Formal rollout across all channels. Highly stressful to deliver when unexpected bugs or tool blocks are discovered." si="සිව්වන පියවර: මුළු ආයතනය පුරාම දියත් කිරීම. පුහුණුවේදී ගැටලු මතු වුවහොත් පාඨමාලාව වෙනස් කිරීම අතිශය අපහසු වේ." />}
+                                                            {activeWorkflowStep === 4 && <Trans en="ADDIE Evaluation: Summative testing sheets. Occurs strictly at the absolute end, when changes can no longer reverse budget sunk cost damages." si="පස්වන පියවර: අවසාන ඇගයීම. පාඨමාලාව අවසන් වූ පසුව ඇගයීම් සිදුකරන බැවින් ව්‍යාපාරික පාඩුව කලින් වැළැක්විය නොහැක." />}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Circular Render */}
+                                            {workflowType === 'sam' && (
+                                                <div className="space-y-8 animate-fadeIn">
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                        {[
+                                                            { step: "Preparation / සූදානම් වීම", desc: "Rapid TNA gathering data directly from operational centers.", focus: "Empirical Analytics" },
+                                                            { step: "Iterative Design / සැලසුම් සංවර්ධනය", desc: "Create rapid paper prototypes and sandboxes for test groups.", focus: "Active Prototyping" },
+                                                            { step: "Iterative Develop / වේගවත් ඇගයීම", desc: "Deploy small microlearning blocks, scaling only on positive behavioral impact.", focus: "Continuous Feedback Loops" }
+                                                        ].map((item, idx) => (
+                                                            <button 
+                                                                key={idx}
+                                                                onClick={() => {
+                                                                    setActiveWorkflowStep(idx);
+                                                                    showToast(`SAM Stage: ${item.step}`, `SAM පියවර තෝරා ගන්නා ලදී.`);
+                                                                }}
+                                                                className={`p-5 rounded-2xl text-left border transition-all ${
+                                                                    activeWorkflowStep === idx 
+                                                                    ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400 shadow-lg shadow-emerald-500/5' 
+                                                                    : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:border-slate-700'
+                                                                }`}
+                                                                style={{ minHeight: '120px' }}
+                                                            >
+                                                                <span className="text-[9px] font-mono text-emerald-500 font-bold uppercase block mb-1">{item.focus}</span>
+                                                                <span className="text-xs font-extrabold block">{item.step}</span>
+                                                                <p className="text-[10px] text-slate-500 mt-2 leading-relaxed">{item.desc}</p>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+
+                                                    <div className="bg-slate-950/60 p-5 rounded-xl border border-slate-800 text-xs space-y-2 animate-fadeIn">
+                                                        <strong className="text-emerald-400 block mb-1"><Trans en="Selected Loop Step In Focus:" si="සැලසුමේ සවිස්තරාත්මක විස්තරය:" /></strong>
+                                                        <p className="text-slate-300">
+                                                            {activeWorkflowStep === 0 && <Trans en="SAM Preparation: Rapid collaborative planning sessions where operational team leaders directly review performance metrics, avoiding month-long planning stagnation." si="පළමු පියවර: ප්‍රායෝගික තොරතුරු සජීවීව රැස් කරමින් ඉතා වේගයෙන් සැලසුම් කිරීම. මාස ගණන් කාලය නාස්ති නොකර සේවා අවශ්‍යතා හඳුනා ගනී." />}
+                                                            {activeWorkflowStep === 1 && <Trans en="SAM Iterative Design: Continuous prototyping of content micro-modules. User focus groups test quick mock-ups to weed out theoretical errors before scaling." si="දෙවන පියවර: නිරන්තරයෙන් අලුත් වන කුඩා පුහුණු මොඩියුල සැලසුම් කිරීම. කුඩා පිරිසක් යොදාගෙන සාර්ථකත්වය පරීක්ෂා කෙරේ." />}
+                                                            {activeWorkflowStep === 2 && <Trans en="SAM Iterative Development: Small microlearning nuggets are released directly to live sandbox nodes, continuously adjusting layout based on daily diagnostic feedback." si="තෙවන පියවර: කෙටි වීඩියෝ හෝ ප්‍රායෝගික අත්හදා බැලීම් සෘජුවම සේවා පරිසරයට දියත් කරමින්, එදිනෙදා ලැබෙන ප්‍රතිචාර මත අඛණ්ඩව යාවත්කාලීන කිරීම." />}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* TAB 8: BREAKOUT ROOMS */}
+                                {activeTab === 'breakout' && (
+                                    <section className="space-y-6 print-active-tab animate-fadeIn">
+                                        <div className="border-b border-slate-800 pb-3">
+                                            <h3 className="text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2">
+                                                <span className="text-emerald-500">💬</span>
+                                                <Trans en="Interactive Breakout Discussion Board" si="සාකච්ඡා සහ විශ්ලේෂණ පුවරුව" />
+                                            </h3>
+                                            <p className="text-xs text-slate-400 mt-1">
+                                                <Trans en="Provocative questions designed to spark debate during interactive classroom breakout sessions" si="වැඩිදුර සාකච්ඡාව සඳහා යොදාගත හැකි ප්‍රධාන ප්‍රශ්න 5ක්" />
+                                            </p>
+                                        </div>
+
+                                        {/* Prompts Layout */}
+                                        <div className="space-y-4 font-sans">
+                                            {[
+                                                {
+                                                    num: "01",
+                                                    title: "The ROI Fallacy Challenge",
+                                                    siTitle: "ආයෝජන ප්‍රතිලාභයේ (ROI) සත්‍යතාවය",
+                                                    prompt: "Should organizations stop calculating rigid monetary ROI (Level 4) for soft-skills training when behavioral changes are notoriously qualitative? How can we justify training budget validity to CFOs without artificial mathematics?",
+                                                    siPrompt: "මෘදු කුසලතා (Soft-skills) වර්ධනය කිරීමේදී මූල්‍යමය ROI ගණනය කිරීම ප්‍රායෝගික නොවන බව සමහරු පවසති. කෘත්‍රිම සංඛ්‍යා ලේඛන පෙන්වන්නේ නැතිව පුහුණු පිරිවැය CFO වෙත සාධාරණීකරණය කරන්නේ කෙසේද?",
+                                                    crib: "Instructional Advice: Pivot students toward surrogate indicators (e.g., error rates, customer retention velocity, operational cycle times) to calculate business impact when direct monetary conversion is highly subjective."
+                                                },
+                                                {
+                                                    num: "02",
+                                                    title: "Succession Ethic vs. Pipeline Inclusivity",
+                                                    siTitle: "අනුප්‍රාප්තික සූදානම්තාව සහ සමානාත්මතාවය",
+                                                    prompt: "Is it strategic or ethical to direct 80% of leadership succession budgets (BSR) strictly toward high-potential (HiPo) employees, while leaving standard workers with minimal baseline training access? What is the cultural cost?",
+                                                    siPrompt: "පුහුණු ප්‍රතිපාදනවලින් 80%ක්ම ප්‍රධාන තනතුරු සඳහා තෝරාගත් සීමිත පිරිසකට (HiPos) පමණක් වෙන්කිරීම සාධාරණද? අනෙක් සේවකයින් නොසලකා හැරීමෙන් ඇති වන ආයතනික ගැටලු මොනවාද?",
+                                                    crib: "Instructional Advice: Push students to debate 'Inclusive vs. Exclusive Talent Development' and explore structural multi-directional career pathing models."
+                                                },
+                                                {
+                                                    num: "03",
+                                                    title: "Traditional Training vs. Structural Re-engineering",
+                                                    siTitle: "පුහුණුව දීම සහ ව්‍යුහය වෙනස් කිරීම",
+                                                    prompt: "When confronted with poor operational performance, HR departments frequently deploy traditional classroom seminars as a default safety shield. If the bottleneck is actually a commission mismatch ('Won't Do'), why do companies repeatedly default to lecturing?",
+                                                    siPrompt: "සේවකයින්ගේ අකාර්යක්ෂමතාවයට හේතුව දිරි දීමනා ක්‍රමයේ දෝෂයක් ('Won't Do') වන විටත්, බොහෝ HR දෙපාර්තමේන්තු දේශන පන්ති පැවැත්වීමට පෙළඹෙන්නේ ඇයි? සැබෑ ගැටලුව හඳුනා නොගන්නේ ඇයි?",
+                                                    crib: "Instructional Advice: Differentiate between capability deficits and systemic motivational blockages. Map how traditional training on motivational deficits worsens employee fatigue."
+                                                },
+                                                {
+                                                    num: "04",
+                                                    title: "Andragogy in Low-Discretion Factory Lines",
+                                                    siTitle: "කාර්මික සේවකයින් සහ Andragogy මූලධර්ම",
+                                                    prompt: "How can Malcolm Knowles' principles of self-directed learner autonomy (Andragogy) be successfully applied to line-workers bound to highly repetitive, highly standardized assembly procedures where discretion is strictly prohibited?",
+                                                    siPrompt: "එක්තරා නිශ්චිත රටාවකට ක්‍රියාත්මක වන කර්මාන්තශාලා සේවා පරිසරයක් තුළ, සේවකයින්ට සවයං-තීරණ ගැනීමට ඉඩ සලසන 'Andragogy' වැඩිහිටි ඉගෙනුම් මූලධර්ම ප්‍රායෝගිකව යොදාගන්නේ කෙසේද?",
+                                                    crib: "Instructional Advice: Direct attention to autonomous problem-solving cohorts, gamified workstation checklists, and involving senior line operators as peer design architects."
+                                                },
+                                                {
+                                                    num: "05",
+                                                    title: "The AI Integration & Skill Obsolescence Gap",
+                                                    siTitle: "කෘතිම බුද්ධිය (AI) සහ කුසලතා යල්පැන යාම",
+                                                    prompt: "As artificial intelligence automates cognitive operational work, standard skill half-lives are dropping to under 18 months. How can traditional training cycles survive when curriculum design takes longer than skill obsolescence?",
+                                                    siPrompt: "කෘතිම බුද්ධිය (AI) නිසා තාක්ෂණික කුසලතාවල වලංගු කාලය මාස 18කට වඩා අඩු වී ඇත. සාම්ප්‍රදායික පුහුණු පන්ති සැලසුම් කිරීමට ගතවන කාලයට වඩා වේගයෙන් කුසලතා යල්පැන යන විට අප මුහුණ දිය යුත්තේ කෙසේද?",
+                                                    crib: "Instructional Advice: Champion rapid adaptive cycles (SAM) over linear curriculums. Advocate for continuous OJT loops, AI copilot shadowing, and performance support engines."
+                                                }
+                                            ].map((prompt, i) => (
+                                                <div 
+                                                    key={i} 
+                                                    className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden hover:border-emerald-500/30 transition-all animate-fadeIn"
+                                                >
+                                                    {/* Header Bar */}
+                                                    <button 
+                                                        onClick={() => {
+                                                            setExpandedPrompt(expandedPrompt === i ? null : i);
+                                                            showToast(
+                                                                expandedPrompt === i ? `Closed Prompt ${prompt.num}` : `Opened Prompt ${prompt.num}`, 
+                                                                expandedPrompt === i ? `සාකච්ඡා කුටිය වසන ලදී.` : `සාකච්ඡා කුටිය විවෘත කරන ලදී.`
+                                                            );
+                                                        }}
+                                                        className="w-full p-4 sm:p-5 text-left flex items-start sm:items-center justify-between gap-4 bg-slate-950/20 hover:bg-slate-950/40 transition-colors border-none cursor-pointer"
+                                                        style={{ minHeight: '50px' }}
+                                                    >
+                                                        <div className="flex items-center gap-3.5 flex-1 min-w-0">
+                                                            <span className="text-emerald-400 font-mono text-xs font-bold bg-emerald-500/10 px-2.5 py-1 rounded-lg">
+                                                                {prompt.num}
+                                                            </span>
+                                                            <div className="truncate">
+                                                                <h4 className="text-xs sm:text-sm font-bold text-slate-200 truncate">
+                                                                    <Trans en={prompt.title} si={prompt.siTitle} />
+                                                                </h4>
+                                                            </div>
+                                                        </div>
+                                                        <span className="text-[10px] sm:text-xs font-bold text-slate-500 whitespace-nowrap">
+                                                            {expandedPrompt === i ? 'CLOSE / වසන්න' : 'EXPAND / විවෘත කරන්න'}
+                                                        </span>
+                                                    </button>
+
+                                                    {/* Content Area */}
+                                                    {expandedPrompt === i && (
+                                                        <div className="p-5 sm:p-6 border-t border-slate-800 space-y-4 bg-slate-950/40 animate-fadeIn">
+                                                            <div className="text-xs sm:text-sm text-slate-200 leading-relaxed font-semibold animate-fadeIn">
+                                                                <Trans en={prompt.prompt} si={prompt.siPrompt} />
+                                                            </div>
+
+                                                            {/* Instructor Crib Guide */}
+                                                            <div className="bg-emerald-950/20 border border-emerald-500/20 p-4 rounded-xl text-[11px] text-emerald-400 font-sans mt-4">
+                                                                <strong className="text-xs block mb-1">💡 Instructor Evaluation Guide / දේශක මඟපෙන්වීම:</strong>
+                                                                {prompt.crib}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                            </div>
+
+                            {/* Interactive Footer & Status Monitor */}
+                            <footer className="mt-auto border-t border-slate-900/80 py-4 px-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-3 no-print bg-slate-950/60 backdrop-blur font-sans">
+                                <div>OBISL CAMPUS • ADVANCED TRAINING & DEVELOPMENT PRACTICUM</div>
+                                <div className="flex items-center gap-2 text-emerald-400 font-semibold bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    <span><Trans en="Active Practical Session" si="සජීවී ප්‍රායෝගික සැසිය" /></span>
+                                </div>
+                                <div className="font-mono text-[10px]">OBISL-M6-V1.0</div>
+                            </footer>
+
+                        </main>
+                    </div>
+                </LangContext.Provider>
+            );
+        };
+
+        // Standard mount logic with protection against race conditions
+        const mountApp = () => {
+            const container = document.getElementById('root');
+            if (container) {
+                const root = ReactDOM.createRoot(container);
+                root.render(<App />);
+            }
+        };
+
+        if (document.readyState === 'loading') {
+            window.addEventListener('DOMContentLoaded', mountApp);
+        } else {
+            mountApp();
+        }
+    </script>
+</body>
+</html>
